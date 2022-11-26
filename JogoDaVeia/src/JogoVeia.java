@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
      * Creates new form JogoVeia
      *
      */
+    private int velha = 0;
     private int jogador1 = 0;
     private int jogador2 = 0;
     private boolean jogada = true;
@@ -50,7 +52,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
 
     }
     
-     public void marcarPosicao(JButton botao) {
+    private void marcarPosicao(JButton botao) {
         if (jogada) {
             botao.setText("X");
 
@@ -61,8 +63,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         botao.setEnabled(false);
     }
 
-
-    public boolean acabou() {
+    private boolean acabou() {
         int acabou = 0;
 
         //contadores das diagonais
@@ -111,66 +112,122 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
                     }
                 }
             }
-
-            //Testes contadores paralelas
-            if (contadorH == 3 || contadorV == 3) {
+            if(contadorH == 3){
                 jogador1++;
+                terminarJogo(1, i);
                 return true;
             }
-            if (contadorH == -3 || contadorV == -3) {
+            if(contadorH == -3){
                 jogador2++;
+                terminarJogo(1, i);
                 return true;
             }
-            
+            if(contadorV == 3){
+                jogador1++;
+                terminarJogo(2, i);
+                return true;
+            }
+            if(contadorV == -3){
+                jogador2++;
+                terminarJogo(2, i);
+                return true;
+            }
         }
-        if (contadorP == 3 || contadorS == 3) {
+        if(contadorP == 3){
             jogador1++;
+            terminarJogo(3, 1);
             return true;
         }
-        if (contadorP == -3 || contadorS == -3) {
+        if(contadorP == -3){
             jogador2++;
+            terminarJogo(3, 1);
+            return true;
+        }
+        if(contadorS == 3){
+            jogador1++;
+            terminarJogo(4, 1);
+            return true;
+        }
+        if(contadorS == -3){
+            jogador2++;
+            terminarJogo(4, 1);
             return true;
         }
         if (acabou == 9) {
-            abrirDialogo("Véia");
+            velha++;
             return true;
         }
         return false;
     }
 
-    public void reiniciaJogo() {
-        for (int lin = 0; lin < 3; lin++) {
-            for (int col = 0; col < 3; col++) {
-                matriz[lin][col].setText(" ");
-                matriz[lin][col].setEnabled(true);
+    private void reiniciaJogo() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                matriz[i][j].setText(" ");
+                matriz[i][j].setEnabled(true);
+                matriz[i][j].setForeground(Color.getColor("140,140,140"));
             }
         }
-
         jogada = true;
-
-    }
-
-    public void abrirDialogo(String texto) {
-        JOptionPane dialogo = new JOptionPane();
-        int showConfirmDialog = dialogo.showConfirmDialog(this, "Deu " + texto + ", você quer jogar novamente?");
-
-        if (showConfirmDialog == 0) {
-            reiniciaJogo();
-        } else {
-            System.exit(0);
-        }
     }
 
    
-    public void atualizarPlacar(){
+
+    private void terminarJogo(int sit, int i){
+        //Tipos de situação (sit)
+        //1-Horizontal
+        //2-Vertical
+        //3-Diagonal primaria
+        //4-diagonal secundaria
+        
+        switch (sit) {
+            case 1 -> {
+                for(int j=0; j<3; j++){
+                    matriz[i][j].setForeground(Color.red);
+                }
+            }
+            case 2 -> {
+                for(int j=0; j<3; j++){
+                    matriz[j][i].setForeground(Color.red);
+                }
+            }
+            case 3 -> {
+                for(int j=0; j<3; j++){
+                    matriz[j][j].setForeground(Color.red);
+                }
+            }
+            case 4 -> {
+                for(int j=0; j<3; j++){
+                    matriz[j][2-j].setForeground(Color.red);
+                }
+            }
+            default -> {
+            }
+        }
+
+        for (int lin = 0; lin < 3; lin++) {
+            for (int col = 0; col < 3; col++) {
+                matriz[lin][col].setEnabled(false);
+            }
+        }
+    }
+   
+    private void atualizarPlacares(){
         placar1.setText(""+jogador1);
         placar2.setText(""+jogador2);
+        placarVelha.setText(""+velha);
+        if(jogada == true){
+            placarVez.setText("X");
+        }else{
+            placarVez.setText("O");
+        }
     }
     
-    public void reiniciaPlacar(){
+    private void reiniciaPlacar(){
         jogador1 = 0;
         jogador2 = 0;
-        atualizarPlacar();
+        velha = 0;
+        atualizarPlacares();
     }
     
     
@@ -194,6 +251,8 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         painelConfig = new javax.swing.JPanel();
         butReiniciar = new javax.swing.JButton();
         butAlterar = new javax.swing.JButton();
+        placarVelha = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Jogo da velha");
@@ -262,6 +321,11 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         });
 
         butOK.setText("OK");
+        butOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butOKActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout painelPrincipalLayout = new javax.swing.GroupLayout(painelPrincipal);
         painelPrincipal.setLayout(painelPrincipalLayout);
@@ -310,25 +374,47 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
             }
         });
 
+        placarVelha.setEditable(false);
+        placarVelha.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+        placarVelha.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        placarVelha.setText("0");
+        placarVelha.setAutoscrolls(false);
+        placarVelha.setEnabled(false);
+
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(140, 140, 140));
+        jLabel1.setText("Velha:");
+
         javax.swing.GroupLayout painelConfigLayout = new javax.swing.GroupLayout(painelConfig);
         painelConfig.setLayout(painelConfigLayout);
         painelConfigLayout.setHorizontalGroup(
             painelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelConfigLayout.createSequentialGroup()
+            .addGroup(painelConfigLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(butAlterar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(butReiniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(placarVelha)
+                .addGap(38, 38, 38)
+                .addGroup(painelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelConfigLayout.createSequentialGroup()
+                        .addComponent(butAlterar)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelConfigLayout.createSequentialGroup()
+                        .addComponent(butReiniciar)
+                        .addGap(39, 39, 39))))
         );
         painelConfigLayout.setVerticalGroup(
             painelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelConfigLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(painelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(butReiniciar)
-                    .addComponent(butAlterar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelConfigLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(painelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(painelConfigLayout.createSequentialGroup()
+                        .addComponent(butReiniciar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(butAlterar))
+                    .addComponent(placarVelha))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -351,8 +437,8 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(painelBotoes, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(painelConfig, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         getAccessibleContext().setAccessibleDescription("");
@@ -370,6 +456,10 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     private void butAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butAlterarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_butAlterarActionPerformed
+
+    private void butOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butOKActionPerformed
+            reiniciaJogo();       
+    }//GEN-LAST:event_butOKActionPerformed
 
     /**
      * @param args the command line arguments
@@ -410,6 +500,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JButton butAlterar;
     private javax.swing.JButton butOK;
     private javax.swing.JButton butReiniciar;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel painelBotoes;
     private javax.swing.JPanel painelConfig;
     private javax.swing.JPanel painelPlacar1;
@@ -417,6 +508,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JPanel painelPrincipal;
     private javax.swing.JTextField placar1;
     private javax.swing.JTextField placar2;
+    private javax.swing.JTextField placarVelha;
     private javax.swing.JTextField placarVez;
     // End of variables declaration//GEN-END:variables
 
@@ -426,9 +518,20 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         aux = (JButton) e.getSource();
         marcarPosicao(aux);
         if(acabou()){
-            reiniciaJogo();
+            
         }
-        atualizarPlacar();
+        atualizarPlacares();
     }
 }
 
+
+
+// public void abrirDialogo(String texto) {
+//        JOptionPane dialogo = new JOptionPane();
+//        int showConfirmDialog = dialogo.showConfirmDialog(this, "Deu " + texto + ", você quer jogar novamente?");
+//        if (showConfirmDialog == 0) {
+//            reiniciaJogo();
+//        } else {
+//            System.exit(0);
+//        }
+//    }
