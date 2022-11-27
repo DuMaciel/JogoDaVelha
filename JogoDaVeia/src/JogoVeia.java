@@ -3,8 +3,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
+
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -20,6 +22,7 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
      * Creates new form JogoVeia
      *
      */
+    private boolean modo= false;
     private int velha = 0;
     private int jogador1 = 0;
     private int jogador2 = 0;
@@ -27,10 +30,8 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     private final JButton matriz[][] = new JButton[3][3];
 
     public JogoVeia(){
-        
         initComponents();
         adicionaBotoes();
-
     }
 
     private void adicionaBotoes() {
@@ -52,17 +53,24 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
 
     }
     
-    private void marcarPosicao(JButton botao) {
-        if (jogada) {
-            botao.setText("X");
-
-        } else {
-            botao.setText("O");
+    private void atualizarPlacares(){
+        placar1.setText(""+jogador1);
+        placar2.setText(""+jogador2);
+        placarVelha.setText(""+velha);
+        if(jogada == true){
+            placarVez.setText("X");
+        }else{
+            placarVez.setText("O");
         }
-        jogada = !jogada;
-        botao.setEnabled(false);
     }
-
+    
+    private void reiniciaPlacar(){
+        jogador1 = 0;
+        jogador2 = 0;
+        velha = 0;
+        atualizarPlacares();
+    }
+    
     private boolean acabou() {
         int acabou = 0;
 
@@ -171,8 +179,6 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         jogada = true;
     }
 
-   
-
     private void terminarJogo(int sit, int i){
         //Tipos de situação (sit)
         //1-Horizontal
@@ -212,24 +218,359 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         }
     }
    
-    private void atualizarPlacares(){
-        placar1.setText(""+jogador1);
-        placar2.setText(""+jogador2);
-        placarVelha.setText(""+velha);
-        if(jogada == true){
-            placarVez.setText("X");
+    
+    
+    private void marcarPosicao(JButton botao) {
+        if (jogada) {
+            botao.setText("X");
+
+        } else {
+            botao.setText("O");
+        }
+        jogada = !jogada;
+        botao.setEnabled(false);
+    }
+    
+    
+    
+    private void alterarModo(){
+        modo = !modo;
+        if(modo == true){
+            painelPlacar2.setBorder(BorderFactory.createTitledBorder("Computador"));
         }else{
-            placarVez.setText("O");
+            painelPlacar2.setBorder(BorderFactory.createTitledBorder("Jogador 2"));
+        }
+        reiniciaJogo();
+        reiniciaPlacar();
+    } 
+    
+    private void jogadaComputador(){
+        if(matriz[1][1].getText().equals(" ")){
+            marcarPosicao(matriz[1][1]);
+        }else{
+            int[] linhas = new int[3];
+            int[] colunas = new int[3];
+            int linha1=0;
+            int linha2=0;
+            int linha3=0;
+            
+            int coluna1=0;
+            int coluna2=0;
+            int coluna3=0;
+            
+            int diagonalP = 0;
+            int diagonalS = 0;
+            
+            for(int j=0; j<3; j++){
+                //teste linhas e colunas
+                for(int i=0; i<3;i++){
+                    if(matriz[i][j].getText().equals(" ")){
+                    }else{
+                        if(matriz[i][j].getText().equals("X")){
+                            linhas[i] += 1;
+                        }else{
+                            linhas[i] -= 1;
+                        }
+                    }
+                    if(matriz[j][i].getText().equals(" ")){
+                    }else{
+                        if(matriz[j][i].getText().equals("X")){
+                            colunas[i] += 1;
+                        }else{
+                            colunas[i] -= 1;
+                        }
+                    }
+                }
+                //teste diagonais
+                if(matriz[j][j].getText().equals(" ")){
+                }else{
+                    if(matriz[j][j].getText().equals("X")){
+                        diagonalP += 1;
+                    }else{
+                        diagonalP -= 1;
+                    }
+                }
+                
+                if(matriz[j][2-j].getText().equals(" ")){
+                }else{
+                    if(matriz[j][2-j].getText().equals("X")){
+                        diagonalS += 1;
+                    }else{
+                        diagonalS -= 1;
+                    }
+                }            
+            }
+
+            
+
+            //jogar diagonais
+            if(diagonalP == 2 || diagonalP == -2){
+                for(int j=0; j<3; j++){
+                    if(matriz[j][j].getText().equals(" ")){
+                        marcarPosicao(matriz[j][j]);
+                    }
+                }
+                return;
+            }
+            if(diagonalS == 2 || diagonalS == -2){
+                for(int j=0; j<3; j++){
+                    if(matriz[j][2-j].getText().equals(" ")){
+                        marcarPosicao(matriz[j][2-j]);
+                    }
+                }
+                return;
+            }
+            
+            boolean jogou = false;
+            
+            //testes linhas
+            for(int i=0; i<3; i++){
+                if(linhas[i] == -2){
+                    for(int j=0; j<3; j++){
+                        if(matriz[i][j].getText().equals(" ")){
+                            marcarPosicao(matriz[i][j]);
+                            jogou = true;
+                            return;
+                        }
+                    }
+                }
+                if(jogou){
+                    return;
+                }
+            }
+            if(jogou){
+                return;
+            }
+            
+            for(int i=0; i<3; i++){
+                if(linhas[i] == 2){
+                    for(int j=0; j<3; j++){
+                        if(matriz[i][j].getText().equals(" ")){
+                            marcarPosicao(matriz[i][j]);
+                            jogou = true;
+                            return;
+                        }
+                    }
+                }
+                if(jogou){
+                    return;
+                }
+            }
+            if(jogou){
+                return;
+            }
+            
+            //testes colunas
+            for(int i=0; i<3; i++){
+                if(colunas[i] == -2){
+                    for(int j=0; j<3; j++){
+                        if(matriz[j][i].getText().equals(" ")){
+                            marcarPosicao(matriz[j][i]);
+                            jogou = true;
+                            return;
+                        }
+                    }
+                }
+                if(jogou){
+                    return;
+                }
+            }
+            
+            if(jogou){
+                return;
+            }
+            
+            for(int i=0; i<3; i++){
+                if(colunas[i] == 2){
+                    for(int j=0; j<3; j++){
+                        if(matriz[j][i].getText().equals(" ")){
+                            marcarPosicao(matriz[j][i]);
+                            jogou = true;
+                            return;
+                        }
+                    }
+                }
+                if(jogou){
+                    return;
+                }
+            }
+            
+            if(jogou){
+                return;
+            }
+            
+            Random gerador = new Random();
+            if(matriz[1][1].getText().equals("O")){
+                //jogada laterais
+                if((linhas[1] == 1 || linhas[1] == -1) || (colunas[1] == 1 || colunas[1] == -1)){
+                    int limite = 0;
+                    do{
+                    limite++;
+                    int pos = gerador.nextInt(4);
+                    switch (pos) {
+                        case 0:
+                            if(matriz[0][1].getText().equals(" ")){
+                                marcarPosicao(matriz[0][1]);
+                                jogou = true;
+                            }
+                            break;
+                        case 1:
+                            if(matriz[2][1].getText().equals(" ")){
+                                marcarPosicao(matriz[2][1]);
+                                jogou = true;
+                            }
+                            break;
+                        case 2:
+                            if(matriz[1][0].getText().equals(" ")){
+                                marcarPosicao(matriz[1][0]);
+                                jogou = true;
+                            }
+                            
+                            break;
+                        case 3:
+                            if(matriz[1][2].getText().equals(" ")){
+                                marcarPosicao(matriz[1][2]);
+                                jogou = true;
+                            }
+                            break;
+                        default:
+                            System.out.println("Erro ao gerar numero aleatorio");
+                    }
+                    }while(!jogou && limite<100);
+            }
+            if(jogou){
+                    return;
+            }
+
+                //jogada diagonais
+                if((diagonalP == 1 || diagonalP == -1) ||(diagonalS == 1 || diagonalS == -1)){
+                    int limite = 0;
+                    do{
+                    limite++;
+                    int pos = gerador.nextInt(4);
+                    switch (pos) {
+                        case 0:
+                            if(matriz[2][2].getText().equals(" ")){
+                                marcarPosicao(matriz[2][2]);
+                                jogou = true;
+                            }
+                            break;
+                        case 1:
+                            if(matriz[0][0].getText().equals(" ")){
+                                marcarPosicao(matriz[0][0]);
+                                jogou = true;
+                            }
+                            break;
+                        case 2:
+                            if(matriz[2][0].getText().equals(" ")){
+                                marcarPosicao(matriz[2][0]);
+                                jogou = true;
+                            }
+                            
+                            break;
+                        case 3:
+                            if(matriz[0][2].getText().equals(" ")){
+                                marcarPosicao(matriz[0][2]);
+                                jogou = true;
+                            }
+                            break;
+                        default:
+                            System.out.println("Erro ao gerar numero aleatorio");
+                    }
+                    }while(!jogou && limite<100);
+                }
+                if(jogou){
+                        return;
+                }
+            }else{
+                //jogada diagonais
+                if((diagonalP == 1 || diagonalP == -1) ||(diagonalS == 1 || diagonalS == -1)){
+                    int limite = 0;
+                    do{
+                    limite++;
+                    int pos = gerador.nextInt(4);
+                    switch (pos) {
+                        case 0:
+                            if(matriz[2][2].getText().equals(" ")){
+                                marcarPosicao(matriz[2][2]);
+                                jogou = true;
+                            }
+                            break;
+                        case 1:
+                            if(matriz[0][0].getText().equals(" ")){
+                                marcarPosicao(matriz[0][0]);
+                                jogou = true;
+                            }
+                            break;
+                        case 2:
+                            if(matriz[2][0].getText().equals(" ")){
+                                marcarPosicao(matriz[2][0]);
+                                jogou = true;
+                            }
+                            
+                            break;
+                        case 3:
+                            if(matriz[0][2].getText().equals(" ")){
+                                marcarPosicao(matriz[0][2]);
+                                jogou = true;
+                            }
+                            break;
+                        default:
+                            System.out.println("Erro ao gerar numero aleatorio");
+                    }
+                    }while(!jogou && limite<100);
+                }
+                if(jogou){
+                        return;
+                }
+                
+                //jogada laterais
+                if((linhas[1] == 1 || linhas[1] == -1) || (colunas[1] == 1 || colunas[1] == -1)){
+                    int limite = 0;
+                    do{
+                    limite++;
+                    int pos = gerador.nextInt(4);
+                    switch (pos) {
+                        case 0:
+                            if(matriz[0][1].getText().equals(" ")){
+                                marcarPosicao(matriz[0][1]);
+                                jogou = true;
+                            }
+                            break;
+                        case 1:
+                            if(matriz[2][1].getText().equals(" ")){
+                                marcarPosicao(matriz[2][1]);
+                                jogou = true;
+                            }
+                            break;
+                        case 2:
+                            if(matriz[1][0].getText().equals(" ")){
+                                marcarPosicao(matriz[1][0]);
+                                jogou = true;
+                            }
+                            
+                            break;
+                        case 3:
+                            if(matriz[1][2].getText().equals(" ")){
+                                marcarPosicao(matriz[1][2]);
+                                jogou = true;
+                            }
+                            break;
+                        default:
+                            System.out.println("Erro ao gerar numero aleatorio");
+                    }
+                    }while(!jogou && limite<100);
+            }
+            if(jogou){
+                    return;
+            }
+            }
+            
+            
+            System.out.println("Error");
+
         }
     }
-    
-    private void reiniciaPlacar(){
-        jogador1 = 0;
-        jogador2 = 0;
-        velha = 0;
-        atualizarPlacares();
-    }
-    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -445,8 +786,8 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void butReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butReiniciarActionPerformed
-    reiniciaJogo();
-    reiniciaPlacar();
+        reiniciaJogo();
+        reiniciaPlacar();
     }//GEN-LAST:event_butReiniciarActionPerformed
 
     private void placarVezActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_placarVezActionPerformed
@@ -454,11 +795,12 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
     }//GEN-LAST:event_placarVezActionPerformed
 
     private void butAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butAlterarActionPerformed
-        // TODO add your handling code here:
+        alterarModo();
     }//GEN-LAST:event_butAlterarActionPerformed
 
     private void butOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butOKActionPerformed
-            reiniciaJogo();       
+        reiniciaJogo();   
+        atualizarPlacares();
     }//GEN-LAST:event_butOKActionPerformed
 
     /**
@@ -517,12 +859,16 @@ public class JogoVeia extends javax.swing.JFrame implements ActionListener {
         JButton aux;
         aux = (JButton) e.getSource();
         marcarPosicao(aux);
-        if(acabou()){
-            
+        if(!acabou()&&modo){
+            jogadaComputador();
+            if(acabou()){
+            }
         }
         atualizarPlacares();
     }
 }
+
+    
 
 
 
